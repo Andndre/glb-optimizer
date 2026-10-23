@@ -44,22 +44,28 @@ The agent or user executing this skill must have the following tools installed:
 
 When a user asks to optimize, compress, or convert 3D models:
 
-### 1. Optimize GLB & Generate USDZ Simultaneously
+### 1. Optimize GLB & Generate USDZ Simultaneously (Default: Draco)
 ```bash
 python <path-to-skill>/scripts/glb_optimizer.py "<target-path>" --out-folder converted --usdz
 ```
 
-### 2. Compress GLB Only (Web / Android)
+### 2. Optimize GLB using Meshopt (Ultra-Fast Runtime & Zero Janks)
+Recommended when the user prioritizes interactive web runtime performance, multi-model scenes, or smooth loading over absolute minimal byte size:
+```bash
+python <path-to-skill>/scripts/glb_optimizer.py "<target-path>" --meshopt --out-folder converted --usdz
+```
+
+### 3. Compress GLB Only (Web / Android)
 ```bash
 python <path-to-skill>/scripts/glb_optimizer.py "<target-path>" --out-folder compressed
 ```
 
-### 3. Convert to USDZ Only (Without GLB Recompression)
+### 4. Convert to USDZ Only (Without GLB Recompression)
 ```bash
 python <path-to-skill>/scripts/glb_optimizer.py "<target-path>" --out-folder usdz_out --usdz-only
 ```
 
-### 4. Custom Texture Size & Suffix
+### 5. Custom Texture Size & Suffix
 ```bash
 python <path-to-skill>/scripts/glb_optimizer.py "<target-path>" --texture-size 2048 --suffix "_opt" --usdz
 ```

@@ -51,24 +51,29 @@ To run the optimization pipeline, your system must have:
 
 You can also use the script directly from your terminal:
 
-### 1. Optimize GLB and Export USDZ Simultaneously
+### 1. Optimize GLB (Default: Draco) and Export USDZ Simultaneously
 ```bash
 python scripts/glb_optimizer.py "path/to/models" --out-folder converted --usdz
 ```
 
-### 2. Compress GLBs Only (Web / Android)
+### 2. Optimize GLB using Meshopt (Ultra-fast SIMD decoding, zero UX lag)
+```bash
+python scripts/glb_optimizer.py "path/to/models" --meshopt --out-folder converted --usdz
+```
+
+### 3. Compress GLBs Only (Web / Android)
 ```bash
 python scripts/glb_optimizer.py "path/to/models" --out-folder compressed
 ```
 
-### 3. Convert Existing GLBs to Apple USDZ Only
+### 4. Convert Existing GLBs to Apple USDZ Only
 ```bash
 python scripts/glb_optimizer.py "path/to/models" --out-folder usdz_out --usdz-only
 ```
 
-### 4. Custom Parameters
+### 5. Custom Parameters
 ```bash
-python scripts/glb_optimizer.py "model.glb" --texture-size 2048 --suffix "_opt" --usdz
+python scripts/glb_optimizer.py "model.glb" --compress meshopt --texture-size 2048 --suffix "_opt" --usdz
 ```
 
 ### CLI Arguments
@@ -76,12 +81,14 @@ python scripts/glb_optimizer.py "model.glb" --texture-size 2048 --suffix "_opt" 
 | Argument | Description | Default |
 | :--- | :--- | :---: |
 | `path` | Path to a `.glb` file or folder containing `.glb` files | `.` (current dir) |
+| `-c, --compress` | Geometry compression: `draco`, `meshopt`, or `none` | `draco` |
+| `--meshopt` | Convenience shortcut for `--compress meshopt` | `False` |
 | `-o, --out-folder` | Subfolder or directory path to save outputs | `compressed` |
 | `-s, --suffix` | Suffix appended before the extension | `_v1` |
 | `-t, --texture-size` | Maximum texture resolution in pixels | `1024` |
 | `--usdz` | Export Apple iOS AR Quick Look `.usdz` | `False` |
 | `--usdz-only` | Only convert to `.usdz` without GLB optimization | `False` |
-| `--no-draco` | Disable Draco geometry compression | `False` |
+| `--no-draco` | Disable geometry compression (same as `--compress none`) | `False` |
 | `--no-clean-space` | Preserve whitespaces in filenames | `False` |
 | `--blender-path` | Manual path to Blender executable | *Auto-detected* |
 

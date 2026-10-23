@@ -108,7 +108,7 @@ def optimize_glb(
     input_path: Path,
     output_path: Path,
     texture_size: int = 1024,
-    use_draco: bool = True,
+    compress_method: str = "draco",
 ) -> bool:
     """Optimizes GLB using gltf-transform CLI."""
     npx_bin = find_npx()
@@ -129,8 +129,12 @@ def optimize_glb(
         "--simplify-lock-border",
         "true",
     ]
-    if use_draco:
-        cmd.extend(["--compress", "draco"])
+    if compress_method in ["draco", "meshopt"]:
+        cmd.extend(["--compress", compress_method])
+        if compress_method == "meshopt":
+            cmd.extend(["--meshopt-level", "high"])
+    elif compress_method in ["none", "false"]:
+        cmd.extend(["--compress", "false"])
 
     result = subprocess.run(
         cmd,
@@ -248,9 +252,21 @@ def main():
         help="Only convert GLB models directly to .usdz without GLB optimization",
     )
     parser.add_argument(
+        "--compress",
+        "-c",
+        choices=["draco", "meshopt", "none"],
+        default="draco",
+        help="Geometry compression method: 'draco' (maximum compression, default), 'meshopt' (ultra-fast SIMD decode, zero UX lag), or 'none'",
+    )
+    parser.add_argument(
+        "--meshopt",
+        action="store_true",
+        help="Shortcut to use meshopt compression (--compress meshopt)",
+    )
+    parser.add_argument(
         "--no-draco",
         action="store_true",
-        help="Disable Draco geometry compression during GLB optimization",
+        help="Disable Draco geometry compression (equivalent to --compress none)",
     )
     parser.add_argument(
         "--blender-path",
@@ -258,6 +274,13 @@ def main():
     )
 
     args = parser.parse_args()
+
+    # Determine compression method
+    compress_method = args.compress
+    if args.meshopt:
+        compress_method = "meshopt"
+    elif args.no_draco:
+        compress_method = "none"
 
     # Locate helper script
     script_dir = Path(__file__).resolve().parent
@@ -308,6 +331,8 @@ def main():
     print(f"Source dir    : {base_dir}")
     print(f"Output dir    : {out_dir}")
     print(f"Texture max   : {args.texture_size}px")
+    if not args.usdz_only:
+        print(f"Compression   : {compress_method.upper()}")
     if args.usdz or args.usdz_only:
         print(f"Blender       : {blender_bin}")
     print("-" * 60)
@@ -335,7 +360,7 @@ def main():
                 input_path=file,
                 output_path=out_glb_path,
                 texture_size=args.texture_size,
-                use_draco=not args.no_draco,
+                compress_method=compress_method,
             )
             if success and out_glb_path.exists():
                 glb_size = out_glb_path.stat().st_size
