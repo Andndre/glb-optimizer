@@ -1,4 +1,12 @@
-import bpy
+# pyright: reportMissingImports=false
+# Note: 'bpy' is Blender's internal Python API module.
+# This script is strictly meant to be executed inside Blender headless:
+#   blender --background --python gltf_to_usdz.py -- <input_glb> <output_usdz> [downscale_size]
+try:
+    import bpy  # type: ignore
+except ImportError:
+    pass
+
 import sys
 import os
 

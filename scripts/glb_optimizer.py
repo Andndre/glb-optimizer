@@ -98,6 +98,8 @@ def run_command(cmd: list, check: bool = True) -> subprocess.CompletedProcess:
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         check=check,
     )
 
@@ -130,7 +132,14 @@ def optimize_glb(
     if use_draco:
         cmd.extend(["--compress", "draco"])
 
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    result = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
     if result.returncode != 0:
         print(f"Error optimizing {input_path.name}:\n{result.stdout}", file=sys.stderr)
         return False
@@ -174,7 +183,14 @@ def convert_to_usdz(
             str(output_path),
             str(texture_size),
         ]
-        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        result = subprocess.run(
+            cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            encoding="utf-8",
+            errors="replace",
+        )
         if result.returncode != 0 or not output_path.exists():
             print(f"Error converting to USDZ {input_path.name}:\n{result.stdout}", file=sys.stderr)
             return False
